@@ -21,11 +21,13 @@
     h1 {
       font-size: 34px;
       margin-bottom: 5px;
+      text-align: center;
     }
 
     .subtitle {
       color: #6b7280;
       margin-bottom: 25px;
+      text-align: center;
     }
 
     .card {
@@ -45,7 +47,7 @@
       gap: 10px;
     }
 
-    input {
+    input[type="text"] {
       flex: 1;
       padding: 12px;
       border-radius: 12px;
@@ -106,13 +108,13 @@
 
 <body>
   <div class="container">
-    <h1>Our Home Hub</h1>
+    <h1>Gergő &amp; Valika 💛</h1>
     <p class="subtitle">Plans, groceries, and chores in one shared place.</p>
 
     <div class="card">
       <h2>📅 Activities</h2>
       <div class="input-row">
-        <input id="activityInput" placeholder="Add activity">
+        <input type="text" id="activityInput" placeholder="Add activity">
         <button onclick="addItem('activities','activityInput')">Add</button>
       </div>
       <ul id="activities"></ul>
@@ -121,7 +123,7 @@
     <div class="card">
       <h2>🛒 Groceries</h2>
       <div class="input-row">
-        <input id="groceryInput" placeholder="Add grocery item">
+        <input type="text" id="groceryInput" placeholder="Add grocery item">
         <button onclick="addItem('groceries','groceryInput')">Add</button>
       </div>
       <ul id="groceries"></ul>
@@ -130,7 +132,7 @@
     <div class="card">
       <h2>🏠 Chores</h2>
       <div class="input-row">
-        <input id="choreInput" placeholder="Add chore">
+        <input type="text" id="choreInput" placeholder="Add chore">
         <button onclick="addItem('chores','choreInput')">Add</button>
       </div>
       <ul id="chores"></ul>
