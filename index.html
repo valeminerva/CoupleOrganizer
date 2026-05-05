@@ -52,11 +52,23 @@
 </div>
 
 <script>
-  if (window.location.search.includes("reset=1")) {
-  localStorage.clear();
+// 🔥 FIX old broken data automatically
+function fixOldData(type) {
+  let data = JSON.parse(localStorage.getItem(type)) || [];
+
+  data = data.map(item => {
+    if (typeof item === "string") {
+      return { text: item, done: false };
+    }
+    return item;
+  });
+
+  localStorage.setItem(type, JSON.stringify(data));
+  return data;
 }
+
 function getData(type) {
-  return JSON.parse(localStorage.getItem(type)) || [];
+  return fixOldData(type);
 }
 
 function saveData(type, data) {
