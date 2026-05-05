@@ -4,59 +4,25 @@
   <title>Our Home Hub</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial;
       padding: 20px;
       background: #f5f5f5;
     }
-
-    h1 { font-size: 28px; }
 
     .card {
       background: white;
       padding: 15px;
       margin: 10px 0;
       border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    input {
-      padding: 8px;
-      margin-right: 5px;
-    }
-
-    button {
-      padding: 8px 12px;
-      background: black;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
     }
 
     li {
-      margin: 8px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      margin: 6px 0;
     }
 
     .done {
       text-decoration: line-through;
       color: gray;
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .small-btn {
-      font-size: 12px;
-      padding: 5px 8px;
-    }
-
-    .delete {
-      background: crimson;
     }
   </style>
 </head>
@@ -66,122 +32,79 @@
 
 <div class="card">
   <h2>Activities</h2>
-  <input id="activityInput" placeholder="Add activity">
-  <button onclick="addActivity()">Add</button>
-  <ul id="activityList"></ul>
+  <input id="activityInput">
+  <button onclick="addItem('activities','activityInput')">Add</button>
+  <ul id="activities"></ul>
 </div>
 
 <div class="card">
-  <h2>Grocery List</h2>
-  <input id="groceryInput" placeholder="Add item">
-  <button onclick="addGrocery()">Add</button>
-  <ul id="groceryList"></ul>
+  <h2>Groceries</h2>
+  <input id="groceryInput">
+  <button onclick="addItem('groceries','groceryInput')">Add</button>
+  <ul id="groceries"></ul>
 </div>
 
 <div class="card">
   <h2>Chores</h2>
-  <input id="choreInput" placeholder="Add chore">
-  <button onclick="addChore()">Add</button>
-  <ul id="choreList"></ul>
+  <input id="choreInput">
+  <button onclick="addItem('chores','choreInput')">Add</button>
+  <ul id="chores"></ul>
 </div>
 
 <script>
-let activities = JSON.parse(localStorage.getItem("activities")) || [];
-let groceries = JSON.parse(localStorage.getItem("groceries")) || [];
-let chores = JSON.parse(localStorage.getItem("chores")) || [];
-
-function saveData() {
-  localStorage.setItem("activities", JSON.stringify(activities));
-  localStorage.setItem("groceries", JSON.stringify(groceries));
-  localStorage.setItem("chores", JSON.stringify(chores));
+function getData(type) {
+  return JSON.parse(localStorage.getItem(type)) || [];
 }
 
-function createItem(text, done = false) {
-  return { text, done };
+function saveData(type, data) {
+  localStorage.setItem(type, JSON.stringify(data));
 }
 
-function renderList(listElementId, items, type) {
-  const list = document.getElementById(listElementId);
+function addItem(type, inputId) {
+  const input = document.getElementById(inputId);
+  if (!input.value.trim()) return;
+
+  const data = getData(type);
+  data.push({ text: input.value, done: false });
+
+  saveData(type, data);
+  input.value = "";
+  render();
+}
+
+function toggle(type, index) {
+  const data = getData(type);
+  data[index].done = !data[index].done;
+
+  saveData(type, data);
+  render();
+}
+
+function renderList(type) {
+  const list = document.getElementById(type);
   list.innerHTML = "";
 
-  items.forEach((item, index) => {
-    if (typeof item === "string") {
-      item = createItem(item, false);
-      items[index] = item;
-    }
+  const data = getData(type);
 
+  data.forEach((item, index) => {
     const li = document.createElement("li");
 
     li.innerHTML = `
-      <span class="${item.done ? "done" : ""}">${item.text}</span>
-      <span class="actions">
-        <button class="small-btn" onclick="toggleDone('${type}', ${index})">
-          ${item.done ? "Undo" : "Done"}
-        </button>
-        <button class="small-btn delete" onclick="deleteItem('${type}', ${index})">
-          Delete
-        </button>
+      <input type="checkbox" ${item.done ? "checked" : ""} 
+        onclick="toggle('${type}', ${index})">
+      <span class="${item.done ? "done" : ""}">
+        ${item.text}
       </span>
     `;
 
     list.appendChild(li);
   });
-
-  saveData();
 }
 
 function render() {
-  renderList("activityList", activities, "activities");
-  renderList("groceryList", groceries, "groceries");
-  renderList("choreList", chores, "chores");
-}
-
-function addActivity() {
-  const input = document.getElementById("activityInput");
-  if (!input.value.trim()) return;
-
-  activities.push(createItem(input.value.trim()));
-  input.value = "";
-  saveData();
-  render();
-}
-
-function addGrocery() {
-  const input = document.getElementById("groceryInput");
-  if (!input.value.trim()) return;
-
-  groceries.push(createItem(input.value.trim()));
-  input.value = "";
-  saveData();
-  render();
-}
-
-function addChore() {
-  const input = document.getElementById("choreInput");
-  if (!input.value.trim()) return;
-
-  chores.push(createItem(input.value.trim()));
-  input.value = "";
-  saveData();
-  render();
-}
-
-function toggleDone(type, index) {
-  if (type === "activities") activities[index].done = !activities[index].done;
-  if (type === "groceries") groceries[index].done = !groceries[index].done;
-  if (type === "chores") chores[index].done = !chores[index].done;
-
-  saveData();
-  render();
-}
-
-function deleteItem(type, index) {
-  if (type === "activities") activities.splice(index, 1);
-  if (type === "groceries") groceries.splice(index, 1);
-  if (type === "chores") chores.splice(index, 1);
-
-  saveData();
-  render();
+  renderList("activities");
+  renderList("groceries");
+  renderList("chores");
 }
 
 render();
