@@ -21,7 +21,7 @@
     h1 {
       text-align: center;
       font-size: 32px;
-      color: #5727F5; /* purple title */
+      color: #5727F5;
     }
 
     .card {
@@ -47,21 +47,28 @@
 
     input[type="text"] {
       flex: 1;
-      min-width: 180px;
+      min-width: 160px;
     }
 
-    /* ADD BUTTON → LIGHT PURPLE */
-    button {
-      padding: 10px 14px;
+    /* + BUTTON */
+    .add-btn {
+      background: #c4b5fd;
+      font-size: 20px;
+      font-weight: bold;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+    }
+
+    .add-btn:hover {
       background: #a78bfa;
-      color: white;
+    }
+
+    button {
       border: none;
       border-radius: 10px;
       cursor: pointer;
-    }
-
-    button:hover {
-      background: #8b5cf6;
+      color: white;
     }
 
     ul {
@@ -90,21 +97,23 @@
       color: gray;
     }
 
-    /* DELETE → SOFT RED */
+    /* DELETE */
     .delete {
       background: #fca5a5;
       font-size: 12px;
+      padding: 6px 8px;
     }
 
     .delete:hover {
       background: #ef4444;
     }
 
-    /* CALENDAR → SOFT GREEN */
+    /* CALENDAR */
     .calendar {
       background: #86efac;
       font-size: 12px;
       color: #065f46;
+      padding: 6px 8px;
     }
 
     .calendar:hover {
@@ -127,6 +136,7 @@
   <div class="container">
     <h1>Gergő &amp; Valika</h1>
 
+    <!-- ACTIVITIES -->
     <div class="card">
       <h2>📅 Activities</h2>
       <div class="input-row">
@@ -138,11 +148,12 @@
           <option>Valika</option>
           <option>Gergő</option>
         </select>
-        <button onclick="addActivity()">+</button>
+        <button class="add-btn" onclick="addActivity()">+</button>
       </div>
       <ul id="activities"></ul>
     </div>
 
+    <!-- GROCERIES -->
     <div class="card">
       <h2>🛒 Groceries</h2>
       <div class="input-row">
@@ -152,11 +163,12 @@
           <option>Valika</option>
           <option>Gergő</option>
         </select>
-        <button onclick="addItem('groceries','groceryInput','groceryUser')">+</button>
+        <button class="add-btn" onclick="addItem('groceries','groceryInput','groceryUser')">+</button>
       </div>
       <ul id="groceries"></ul>
     </div>
 
+    <!-- CHORES -->
     <div class="card">
       <h2>🏠 Chores</h2>
       <div class="input-row">
@@ -166,7 +178,7 @@
           <option>Valika</option>
           <option>Gergő</option>
         </select>
-        <button onclick="addItem('chores','choreInput','choreUser')">+</button>
+        <button class="add-btn" onclick="addItem('chores','choreInput','choreUser')">+</button>
       </div>
       <ul id="chores"></ul>
     </div>
@@ -222,7 +234,6 @@ function addItem(type, inputId, userId) {
   });
 
   saveData(type, data);
-
   input.value = "";
   render();
 }
@@ -291,6 +302,7 @@ function renderActivities() {
 
   data.forEach((item, index) => {
     const currentUser = item.user || "Both";
+
     const li = document.createElement("li");
 
     li.innerHTML = `
@@ -307,8 +319,8 @@ function renderActivities() {
         <option ${currentUser === "Gergő" ? "selected" : ""}>Gergő</option>
       </select>
 
-      <button class="calendar" onclick="openGoogleCalendar(${index})">Calendar</button>
-      <button class="delete" onclick="deleteItem('activities', ${index})">X</button>
+      <button class="calendar" onclick="openGoogleCalendar(${index})">📅</button>
+      <button class="delete" onclick="deleteItem('activities', ${index})">✕</button>
     `;
 
     list.appendChild(li);
@@ -323,6 +335,7 @@ function renderList(type) {
 
   data.forEach((item, index) => {
     const currentUser = item.user || "Both";
+
     const li = document.createElement("li");
 
     li.innerHTML = `
@@ -338,7 +351,7 @@ function renderList(type) {
         <option ${currentUser === "Gergő" ? "selected" : ""}>Gergő</option>
       </select>
 
-      <button class="delete" onclick="deleteItem('${type}', ${index})">X</button>
+      <button class="delete" onclick="deleteItem('${type}', ${index})">✕</button>
     `;
 
     list.appendChild(li);
