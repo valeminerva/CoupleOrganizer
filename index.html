@@ -13,7 +13,7 @@
     }
 
     .container {
-      max-width: 700px;
+      max-width: 750px;
       margin: auto;
       padding: 20px;
     }
@@ -36,6 +36,7 @@
       display: flex;
       gap: 10px;
       margin-bottom: 10px;
+      flex-wrap: wrap;
     }
 
     input, select {
@@ -44,8 +45,9 @@
       border: 1px solid #ccc;
     }
 
-    input {
+    input[type="text"] {
       flex: 1;
+      min-width: 180px;
     }
 
     button {
@@ -70,10 +72,12 @@
       padding: 10px;
       margin-top: 8px;
       border-radius: 10px;
+      flex-wrap: wrap;
     }
 
     li span {
       flex: 1;
+      min-width: 120px;
     }
 
     .done {
@@ -86,12 +90,18 @@
       font-size: 12px;
     }
 
-    .delete:hover {
-      background: #dc2626;
+    .calendar {
+      background: #16a34a;
+      font-size: 12px;
     }
 
     .assignment {
       max-width: 110px;
+    }
+
+    .date-info {
+      font-size: 12px;
+      color: #6b7280;
     }
   </style>
 </head>
@@ -103,13 +113,15 @@
     <div class="card">
       <h2>📅 Activities</h2>
       <div class="input-row">
-        <input id="activityInput" placeholder="Add activity">
+        <input type="text" id="activityInput" placeholder="Add activity">
+        <input type="date" id="activityDate">
+        <input type="time" id="activityTime">
         <select id="activityUser">
           <option>Both</option>
           <option>Valika</option>
           <option>Gergő</option>
         </select>
-        <button onclick="addItem('activities','activityInput','activityUser')">Add</button>
+        <button onclick="addActivity()">Add</button>
       </div>
       <ul id="activities"></ul>
     </div>
@@ -117,7 +129,7 @@
     <div class="card">
       <h2>🛒 Groceries</h2>
       <div class="input-row">
-        <input id="groceryInput" placeholder="Add item">
+        <input type="text" id="groceryInput" placeholder="Add item">
         <select id="groceryUser">
           <option>Both</option>
           <option>Valika</option>
@@ -131,7 +143,7 @@
     <div class="card">
       <h2>🏠 Chores</h2>
       <div class="input-row">
-        <input id="choreInput" placeholder="Add chore">
+        <input type="text" id="choreInput" placeholder="Add chore">
         <select id="choreUser">
           <option>Both</option>
           <option>Valika</option>
@@ -150,6 +162,33 @@ function getData(type) {
 
 function saveData(type, data) {
   localStorage.setItem(type, JSON.stringify(data));
+}
+
+function addActivity() {
+  const input = document.getElementById("activityInput");
+  const date = document.getElementById("activityDate");
+  const time = document.getElementById("activityTime");
+  const user = document.getElementById("activityUser").value;
+
+  if (!input.value.trim()) return;
+
+  const data = getData("activities");
+
+  data.push({
+    text: input.value.trim(),
+    date: date.value,
+    time: time.value,
+    done: false,
+    user: user
+  });
+
+  saveData("activities", data);
+
+  input.value = "";
+  date.value = "";
+  time.value = "";
+
+  render();
 }
 
 function addItem(type, inputId, userId) {
@@ -192,6 +231,73 @@ function deleteItem(type, index) {
   render();
 }
 
+function formatGoogleDate(date, time) {
+  if (!date) return "";
+
+  const start = date.replaceAll("-", "") + "T" + (time ? time.replace(":", "") : "0900") + "00";
+
+  let endHour = 10;
+  if (time) {
+    endHour = Number(time.split(":")[0]) + 1;
+  }
+
+  const endTime = String(endHour).padStart(2, "0") + (time ? time.split(":")[1] : "00");
+  const end = date.replaceAll("-", "") + "T" + endTime + "00";
+
+  return start + "/" + end;
+}
+
+function openGoogleCalendar(item) {
+  if (!item.date) {
+    alert("Please add a date first.");
+    return;
+  }
+
+  const title = encodeURIComponent(item.text);
+  const details = encodeURIComponent("Assigned to: " + (item.user || "Both"));
+  const dates = formatGoogleDate(item.date, item.time);
+
+  const url =
+    "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+    "&text=" + title +
+    "&details=" + details +
+    "&dates=" + dates;
+
+  window.open(url, "_blank");
+}
+
+function renderActivities() {
+  const list = document.getElementById("activities");
+  list.innerHTML = "";
+
+  const data = getData("activities");
+
+  data.forEach((item, index) => {
+    const currentUser = item.user || "Both";
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      <input type="checkbox" ${item.done ? "checked" : ""} onclick="toggle('activities', ${index})">
+
+      <span class="${item.done ? "done" : ""}">
+        ${item.text}
+        <div class="date-info">${item.date || "No date"} ${item.time || ""}</div>
+      </span>
+
+      <select class="assignment" onchange="changeAssignment('activities', ${index}, this.value)">
+        <option ${currentUser === "Both" ? "selected" : ""}>Both</option>
+        <option ${currentUser === "Valika" ? "selected" : ""}>Valika</option>
+        <option ${currentUser === "Gergő" ? "selected" : ""}>Gergő</option>
+      </select>
+
+      <button class="calendar" onclick="openGoogleCalendar(${index})">Calendar</button>
+      <button class="delete" onclick="deleteItem('activities', ${index})">X</button>
+    `;
+
+    list.appendChild(li);
+  });
+}
+
 function renderList(type) {
   const list = document.getElementById(type);
   list.innerHTML = "";
@@ -200,7 +306,6 @@ function renderList(type) {
 
   data.forEach((item, index) => {
     const currentUser = item.user || "Both";
-
     const li = document.createElement("li");
 
     li.innerHTML = `
@@ -224,7 +329,7 @@ function renderList(type) {
 }
 
 function render() {
-  renderList("activities");
+  renderActivities();
   renderList("groceries");
   renderList("chores");
 }
