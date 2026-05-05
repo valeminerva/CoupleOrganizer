@@ -187,7 +187,6 @@ function addActivity() {
   input.value = "";
   date.value = "";
   time.value = "";
-
   render();
 }
 
@@ -206,6 +205,7 @@ function addItem(type, inputId, userId) {
   });
 
   saveData(type, data);
+
   input.value = "";
   render();
 }
@@ -232,17 +232,17 @@ function deleteItem(type, index) {
 }
 
 function formatGoogleDate(date, time) {
-  if (!date) return "";
+  const startTime = time || "09:00";
+  const parts = startTime.split(":");
+  const hour = parts[0];
+  const minute = parts[1];
 
-  const start = date.replaceAll("-", "") + "T" + (time ? time.replace(":", "") : "0900") + "00";
+  const endHour = String(Number(hour) + 1).padStart(2, "0");
 
-  let endHour = 10;
-  if (time) {
-    endHour = Number(time.split(":")[0]) + 1;
-  }
+  const cleanDate = date.replaceAll("-", "");
 
-  const endTime = String(endHour).padStart(2, "0") + (time ? time.split(":")[1] : "00");
-  const end = date.replaceAll("-", "") + "T" + endTime + "00";
+  const start = cleanDate + "T" + hour + minute + "00";
+  const end = cleanDate + "T" + endHour + minute + "00";
 
   return start + "/" + end;
 }
@@ -251,24 +251,7 @@ function openGoogleCalendar(index) {
   const data = getData("activities");
   const item = data[index];
 
-  if (!item.date) {
-    alert("Please add a date first.");
-    return;
-  }
-
-  const title = encodeURIComponent(item.text);
-  const details = encodeURIComponent("Assigned to: " + (item.user || "Both"));
-  const dates = formatGoogleDate(item.date, item.time);
-
-  const url =
-    "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-    "&text=" + title +
-    "&details=" + details +
-    "&dates=" + dates;
-
-  window.open(url, "_blank");
-}
-  if (!item.date) {
+  if (!item || !item.date) {
     alert("Please add a date first.");
     return;
   }
