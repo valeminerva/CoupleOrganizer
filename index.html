@@ -37,6 +37,13 @@
 
     li {
       margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .delete {
+      color: red;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -66,44 +73,90 @@
 </div>
 
 <script>
+// Load saved data
+let activities = JSON.parse(localStorage.getItem("activities")) || [];
+let groceries = JSON.parse(localStorage.getItem("groceries")) || [];
+let chores = JSON.parse(localStorage.getItem("chores")) || [];
+
+// Save function
+function saveData() {
+  localStorage.setItem("activities", JSON.stringify(activities));
+  localStorage.setItem("groceries", JSON.stringify(groceries));
+  localStorage.setItem("chores", JSON.stringify(chores));
+}
+
+// Render lists
+function render() {
+  const activityList = document.getElementById("activityList");
+  const groceryList = document.getElementById("groceryList");
+  const choreList = document.getElementById("choreList");
+
+  activityList.innerHTML = "";
+  groceryList.innerHTML = "";
+  choreList.innerHTML = "";
+
+  activities.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${item} <span class="delete" onclick="deleteItem('activities', ${index})">✖</span>`;
+    activityList.appendChild(li);
+  });
+
+  groceries.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${item} <span class="delete" onclick="deleteItem('groceries', ${index})">✖</span>`;
+    groceryList.appendChild(li);
+  });
+
+  chores.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${item} <span class="delete" onclick="deleteItem('chores', ${index})">✖</span>`;
+    choreList.appendChild(li);
+  });
+}
+
+// Add functions
 function addActivity() {
   const input = document.getElementById("activityInput");
-  const list = document.getElementById("activityList");
+  if (!input.value.trim()) return;
 
-  if (input.value.trim() === "") return;
-
-  const li = document.createElement("li");
-  li.textContent = input.value;
-
-  list.appendChild(li);
+  activities.push(input.value);
   input.value = "";
+  saveData();
+  render();
 }
 
 function addGrocery() {
   const input = document.getElementById("groceryInput");
-  const list = document.getElementById("groceryList");
+  if (!input.value.trim()) return;
 
-  if (input.value.trim() === "") return;
-
-  const li = document.createElement("li");
-  li.textContent = input.value;
-
-  list.appendChild(li);
+  groceries.push(input.value);
   input.value = "";
+  saveData();
+  render();
 }
 
 function addChore() {
   const input = document.getElementById("choreInput");
-  const list = document.getElementById("choreList");
+  if (!input.value.trim()) return;
 
-  if (input.value.trim() === "") return;
-
-  const li = document.createElement("li");
-  li.textContent = input.value;
-
-  list.appendChild(li);
+  chores.push(input.value);
   input.value = "";
+  saveData();
+  render();
 }
+
+// Delete function
+function deleteItem(type, index) {
+  if (type === "activities") activities.splice(index, 1);
+  if (type === "groceries") groceries.splice(index, 1);
+  if (type === "chores") chores.splice(index, 1);
+
+  saveData();
+  render();
+}
+
+// Initial render
+render();
 </script>
 
 </body>
