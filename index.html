@@ -52,6 +52,9 @@
 </div>
 
 <script>
+  if (window.location.search.includes("reset=1")) {
+  localStorage.clear();
+}
 function getData(type) {
   return JSON.parse(localStorage.getItem(type)) || [];
 }
