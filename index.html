@@ -80,16 +80,17 @@
       color: gray;
     }
 
-    .assignee {
+    .delete {
+      background: #ef4444;
       font-size: 12px;
-      background: #e5e7eb;
-      padding: 3px 6px;
-      border-radius: 6px;
     }
 
-    .delete {
-      background: red;
-      font-size: 12px;
+    .delete:hover {
+      background: #dc2626;
+    }
+
+    .assignment {
+      max-width: 110px;
     }
   </style>
 </head>
@@ -98,7 +99,6 @@
   <div class="container">
     <h1>Gergő &amp; Valika</h1>
 
-    <!-- Activities -->
     <div class="card">
       <h2>📅 Activities</h2>
       <div class="input-row">
@@ -113,7 +113,6 @@
       <ul id="activities"></ul>
     </div>
 
-    <!-- Groceries -->
     <div class="card">
       <h2>🛒 Groceries</h2>
       <div class="input-row">
@@ -128,7 +127,6 @@
       <ul id="groceries"></ul>
     </div>
 
-    <!-- Chores -->
     <div class="card">
       <h2>🏠 Chores</h2>
       <div class="input-row">
@@ -160,6 +158,7 @@ function addItem(type, inputId, userId) {
   if (!input.value.trim()) return;
 
   const data = getData(type);
+
   data.push({
     text: input.value.trim(),
     done: false,
@@ -178,6 +177,13 @@ function toggle(type, index) {
   render();
 }
 
+function changeAssignment(type, index, newUser) {
+  const data = getData(type);
+  data[index].user = newUser;
+  saveData(type, data);
+  render();
+}
+
 function deleteItem(type, index) {
   const data = getData(type);
   data.splice(index, 1);
@@ -192,12 +198,23 @@ function renderList(type) {
   const data = getData(type);
 
   data.forEach((item, index) => {
+    const currentUser = item.user || "Both";
+
     const li = document.createElement("li");
 
     li.innerHTML = `
       <input type="checkbox" ${item.done ? "checked" : ""} onclick="toggle('${type}', ${index})">
-      <span class="${item.done ? "done" : ""}">${item.text}</span>
-      <span class="assignee">${item.user}</span>
+
+      <span class="${item.done ? "done" : ""}">
+        ${item.text}
+      </span>
+
+      <select class="assignment" onchange="changeAssignment('${type}', ${index}, this.value)">
+        <option ${currentUser === "Both" ? "selected" : ""}>Both</option>
+        <option ${currentUser === "Valika" ? "selected" : ""}>Valika</option>
+        <option ${currentUser === "Gergő" ? "selected" : ""}>Gergő</option>
+      </select>
+
       <button class="delete" onclick="deleteItem('${type}', ${index})">X</button>
     `;
 
