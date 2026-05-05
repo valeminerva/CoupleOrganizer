@@ -19,15 +19,8 @@
     }
 
     h1 {
-      font-size: 34px;
-      margin-bottom: 5px;
       text-align: center;
-    }
-
-    .subtitle {
-      color: #6b7280;
-      margin-bottom: 25px;
-      text-align: center;
+      font-size: 32px;
     }
 
     .card {
@@ -38,41 +31,34 @@
       box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     }
 
-    h2 {
-      margin-top: 0;
-    }
-
     .input-row {
       display: flex;
       gap: 10px;
+      margin-bottom: 10px;
     }
 
-    input[type="text"] {
+    input, select {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    input {
       flex: 1;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #d1d5db;
-      font-size: 15px;
     }
 
     button {
-      padding: 12px 16px;
+      padding: 10px 14px;
       background: #111827;
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background: #374151;
     }
 
     ul {
-      padding-left: 0;
       list-style: none;
-      margin-bottom: 0;
+      padding: 0;
     }
 
     li {
@@ -80,9 +66,9 @@
       align-items: center;
       gap: 10px;
       background: #f9fafb;
-      margin-top: 10px;
-      padding: 12px;
-      border-radius: 12px;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 10px;
     }
 
     li span {
@@ -91,49 +77,68 @@
 
     .done {
       text-decoration: line-through;
-      color: #9ca3af;
+      color: gray;
+    }
+
+    .assignee {
+      font-size: 12px;
+      background: #e5e7eb;
+      padding: 3px 6px;
+      border-radius: 6px;
     }
 
     .delete {
-      background: #ef4444;
-      padding: 8px 10px;
+      background: red;
       font-size: 12px;
-    }
-
-    .delete:hover {
-      background: #dc2626;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>Gergő &amp; Valika 💛</h1>
-    <p class="subtitle">Plans, groceries, and chores in one shared place.</p>
+    <h1>Gergő &amp; Valika</h1>
 
+    <!-- Activities -->
     <div class="card">
       <h2>📅 Activities</h2>
       <div class="input-row">
-        <input type="text" id="activityInput" placeholder="Add activity">
-        <button onclick="addItem('activities','activityInput')">Add</button>
+        <input id="activityInput" placeholder="Add activity">
+        <select id="activityUser">
+          <option>Both</option>
+          <option>Valika</option>
+          <option>Gergő</option>
+        </select>
+        <button onclick="addItem('activities','activityInput','activityUser')">Add</button>
       </div>
       <ul id="activities"></ul>
     </div>
 
+    <!-- Groceries -->
     <div class="card">
       <h2>🛒 Groceries</h2>
       <div class="input-row">
-        <input type="text" id="groceryInput" placeholder="Add grocery item">
-        <button onclick="addItem('groceries','groceryInput')">Add</button>
+        <input id="groceryInput" placeholder="Add item">
+        <select id="groceryUser">
+          <option>Both</option>
+          <option>Valika</option>
+          <option>Gergő</option>
+        </select>
+        <button onclick="addItem('groceries','groceryInput','groceryUser')">Add</button>
       </div>
       <ul id="groceries"></ul>
     </div>
 
+    <!-- Chores -->
     <div class="card">
       <h2>🏠 Chores</h2>
       <div class="input-row">
-        <input type="text" id="choreInput" placeholder="Add chore">
-        <button onclick="addItem('chores','choreInput')">Add</button>
+        <input id="choreInput" placeholder="Add chore">
+        <select id="choreUser">
+          <option>Both</option>
+          <option>Valika</option>
+          <option>Gergő</option>
+        </select>
+        <button onclick="addItem('chores','choreInput','choreUser')">Add</button>
       </div>
       <ul id="chores"></ul>
     </div>
@@ -148,12 +153,18 @@ function saveData(type, data) {
   localStorage.setItem(type, JSON.stringify(data));
 }
 
-function addItem(type, inputId) {
+function addItem(type, inputId, userId) {
   const input = document.getElementById(inputId);
+  const user = document.getElementById(userId).value;
+
   if (!input.value.trim()) return;
 
   const data = getData(type);
-  data.push({ text: input.value.trim(), done: false });
+  data.push({
+    text: input.value.trim(),
+    done: false,
+    user: user
+  });
 
   saveData(type, data);
   input.value = "";
@@ -186,7 +197,8 @@ function renderList(type) {
     li.innerHTML = `
       <input type="checkbox" ${item.done ? "checked" : ""} onclick="toggle('${type}', ${index})">
       <span class="${item.done ? "done" : ""}">${item.text}</span>
-      <button class="delete" onclick="deleteItem('${type}', ${index})">Delete</button>
+      <span class="assignee">${item.user}</span>
+      <button class="delete" onclick="deleteItem('${type}', ${index})">X</button>
     `;
 
     list.appendChild(li);
