@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -15,7 +19,7 @@
     .container {
       max-width: 750px;
       margin: auto;
-      padding: 20px;
+      padding: 16px;
     }
 
     h1 {
@@ -26,49 +30,44 @@
 
     .card {
       background: white;
-      padding: 20px;
+      padding: 18px;
       margin-bottom: 18px;
       border-radius: 18px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     }
 
     .input-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr auto;
       gap: 10px;
       margin-bottom: 10px;
-      flex-wrap: wrap;
+    }
+
+    input, select, button {
+      min-height: 44px;
+      font-size: 16px;
+      border-radius: 12px;
     }
 
     input, select {
+      width: 100%;
       padding: 10px;
-      border-radius: 10px;
       border: 1px solid #ccc;
     }
 
-    input[type="text"] {
-      flex: 1;
-      min-width: 160px;
+    .wide {
+      grid-column: 1 / -1;
     }
 
-    /* + BUTTON */
     .add-btn {
       background: #c4b5fd;
-      font-size: 20px;
-      font-weight: bold;
-      width: 42px;
-      height: 42px;
-      padding: 0;
-    }
-
-    .add-btn:hover {
-      background: #a78bfa;
-    }
-
-    button {
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
       color: white;
+      border: none;
+      font-size: 24px;
+      font-weight: bold;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
     }
 
     ul {
@@ -77,19 +76,26 @@
     }
 
     li {
-      display: flex;
-      align-items: center;
+      display: grid;
+      grid-template-columns: auto 1fr;
       gap: 10px;
       background: #f9fafb;
-      padding: 10px;
-      margin-top: 8px;
-      border-radius: 10px;
-      flex-wrap: wrap;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 12px;
     }
 
-    li span {
-      flex: 1;
-      min-width: 120px;
+    .item-text {
+      min-width: 0;
+      word-break: break-word;
+    }
+
+    .item-actions {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
     }
 
     .done {
@@ -97,37 +103,61 @@
       color: gray;
     }
 
-    /* DELETE */
     .delete {
       background: #fca5a5;
-      font-size: 12px;
-      padding: 6px 8px;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
     }
 
-    .delete:hover {
-      background: #ef4444;
-    }
-
-    /* CALENDAR */
     .calendar {
       background: #86efac;
-      font-size: 12px;
       color: #065f46;
-      padding: 6px 8px;
-    }
-
-    .calendar:hover {
-      background: #22c55e;
-      color: white;
-    }
-
-    .assignment {
-      max-width: 110px;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
     }
 
     .date-info {
-      font-size: 12px;
+      font-size: 13px;
       color: #6b7280;
+      margin-top: 3px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .input-row {
+        grid-template-columns: 1fr;
+      }
+
+      .add-btn {
+        width: 100%;
+      }
+
+      .item-actions {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .item-actions select {
+        grid-column: 1 / -1;
+      }
+
+      .calendar,
+      .delete {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -136,11 +166,10 @@
   <div class="container">
     <h1>Gergő &amp; Valika</h1>
 
-    <!-- ACTIVITIES -->
     <div class="card">
       <h2>📅 Activities</h2>
       <div class="input-row">
-        <input type="text" id="activityInput" placeholder="Add activity">
+        <input class="wide" type="text" id="activityInput" placeholder="Add activity">
         <input type="date" id="activityDate">
         <input type="time" id="activityTime">
         <select id="activityUser">
@@ -153,7 +182,6 @@
       <ul id="activities"></ul>
     </div>
 
-    <!-- GROCERIES -->
     <div class="card">
       <h2>🛒 Groceries</h2>
       <div class="input-row">
@@ -168,7 +196,6 @@
       <ul id="groceries"></ul>
     </div>
 
-    <!-- CHORES -->
     <div class="card">
       <h2>🏠 Chores</h2>
       <div class="input-row">
@@ -202,7 +229,6 @@ function addActivity() {
   if (!input.value.trim()) return;
 
   const data = getData("activities");
-
   data.push({
     text: input.value.trim(),
     date: date.value,
@@ -212,7 +238,6 @@ function addActivity() {
   });
 
   saveData("activities", data);
-
   input.value = "";
   date.value = "";
   time.value = "";
@@ -226,7 +251,6 @@ function addItem(type, inputId, userId) {
   if (!input.value.trim()) return;
 
   const data = getData(type);
-
   data.push({
     text: input.value.trim(),
     done: false,
@@ -263,13 +287,9 @@ function formatGoogleDate(date, time) {
   const startTime = time || "09:00";
   const [hour, minute] = startTime.split(":");
   const endHour = String(Number(hour) + 1).padStart(2, "0");
-
   const cleanDate = date.replaceAll("-", "");
 
-  const start = cleanDate + "T" + hour + minute + "00";
-  const end = cleanDate + "T" + endHour + minute + "00";
-
-  return start + "/" + end;
+  return cleanDate + "T" + hour + minute + "00/" + cleanDate + "T" + endHour + minute + "00";
 }
 
 function openGoogleCalendar(index) {
@@ -281,15 +301,11 @@ function openGoogleCalendar(index) {
     return;
   }
 
-  const title = encodeURIComponent(item.text);
-  const details = encodeURIComponent("Assigned to: " + (item.user || "Both"));
-  const dates = formatGoogleDate(item.date, item.time);
-
   const url =
     "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-    "&text=" + title +
-    "&details=" + details +
-    "&dates=" + dates;
+    "&text=" + encodeURIComponent(item.text) +
+    "&details=" + encodeURIComponent("Assigned to: " + (item.user || "Both")) +
+    "&dates=" + formatGoogleDate(item.date, item.time);
 
   window.open(url, "_blank");
 }
@@ -302,25 +318,25 @@ function renderActivities() {
 
   data.forEach((item, index) => {
     const currentUser = item.user || "Both";
-
     const li = document.createElement("li");
 
     li.innerHTML = `
       <input type="checkbox" ${item.done ? "checked" : ""} onclick="toggle('activities', ${index})">
 
-      <span class="${item.done ? "done" : ""}">
+      <div class="item-text ${item.done ? "done" : ""}">
         ${item.text}
         <div class="date-info">${item.date || "No date"} ${item.time || ""}</div>
-      </span>
+      </div>
 
-      <select class="assignment" onchange="changeAssignment('activities', ${index}, this.value)">
-        <option ${currentUser === "Both" ? "selected" : ""}>Both</option>
-        <option ${currentUser === "Valika" ? "selected" : ""}>Valika</option>
-        <option ${currentUser === "Gergő" ? "selected" : ""}>Gergő</option>
-      </select>
-
-      <button class="calendar" onclick="openGoogleCalendar(${index})">📅</button>
-      <button class="delete" onclick="deleteItem('activities', ${index})">✕</button>
+      <div class="item-actions">
+        <select onchange="changeAssignment('activities', ${index}, this.value)">
+          <option ${currentUser === "Both" ? "selected" : ""}>Both</option>
+          <option ${currentUser === "Valika" ? "selected" : ""}>Valika</option>
+          <option ${currentUser === "Gergő" ? "selected" : ""}>Gergő</option>
+        </select>
+        <button class="calendar" onclick="openGoogleCalendar(${index})">📅</button>
+        <button class="delete" onclick="deleteItem('activities', ${index})">✕</button>
+      </div>
     `;
 
     list.appendChild(li);
@@ -335,23 +351,23 @@ function renderList(type) {
 
   data.forEach((item, index) => {
     const currentUser = item.user || "Both";
-
     const li = document.createElement("li");
 
     li.innerHTML = `
       <input type="checkbox" ${item.done ? "checked" : ""} onclick="toggle('${type}', ${index})">
 
-      <span class="${item.done ? "done" : ""}">
+      <div class="item-text ${item.done ? "done" : ""}">
         ${item.text}
-      </span>
+      </div>
 
-      <select class="assignment" onchange="changeAssignment('${type}', ${index}, this.value)">
-        <option ${currentUser === "Both" ? "selected" : ""}>Both</option>
-        <option ${currentUser === "Valika" ? "selected" : ""}>Valika</option>
-        <option ${currentUser === "Gergő" ? "selected" : ""}>Gergő</option>
-      </select>
-
-      <button class="delete" onclick="deleteItem('${type}', ${index})">✕</button>
+      <div class="item-actions">
+        <select onchange="changeAssignment('${type}', ${index}, this.value)">
+          <option ${currentUser === "Both" ? "selected" : ""}>Both</option>
+          <option ${currentUser === "Valika" ? "selected" : ""}>Valika</option>
+          <option ${currentUser === "Gergő" ? "selected" : ""}>Gergő</option>
+        </select>
+        <button class="delete" onclick="deleteItem('${type}', ${index})">✕</button>
+      </div>
     `;
 
     list.appendChild(li);
