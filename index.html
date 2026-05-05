@@ -247,7 +247,27 @@ function formatGoogleDate(date, time) {
   return start + "/" + end;
 }
 
-function openGoogleCalendar(item) {
+function openGoogleCalendar(index) {
+  const data = getData("activities");
+  const item = data[index];
+
+  if (!item.date) {
+    alert("Please add a date first.");
+    return;
+  }
+
+  const title = encodeURIComponent(item.text);
+  const details = encodeURIComponent("Assigned to: " + (item.user || "Both"));
+  const dates = formatGoogleDate(item.date, item.time);
+
+  const url =
+    "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+    "&text=" + title +
+    "&details=" + details +
+    "&dates=" + dates;
+
+  window.open(url, "_blank");
+}
   if (!item.date) {
     alert("Please add a date first.");
     return;
