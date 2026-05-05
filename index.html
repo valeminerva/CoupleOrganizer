@@ -2,57 +2,142 @@
 <html>
 <head>
   <title>Our Home Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
       padding: 20px;
-      background: #f5f5f5;
+    }
+
+    h1 {
+      font-size: 34px;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 25px;
     }
 
     .card {
       background: white;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 18px;
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
+    }
+
+    button {
+      padding: 12px 16px;
+      background: #111827;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #374151;
+    }
+
+    ul {
+      padding-left: 0;
+      list-style: none;
+      margin-bottom: 0;
     }
 
     li {
-      margin: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f9fafb;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    li span {
+      flex: 1;
     }
 
     .done {
       text-decoration: line-through;
-      color: gray;
+      color: #9ca3af;
+    }
+
+    .delete {
+      background: #ef4444;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+
+    .delete:hover {
+      background: #dc2626;
     }
   </style>
 </head>
+
 <body>
+  <div class="container">
+    <h1>Our Home Hub</h1>
+    <p class="subtitle">Plans, groceries, and chores in one shared place.</p>
 
-<h1>Our Home Hub</h1>
+    <div class="card">
+      <h2>📅 Activities</h2>
+      <div class="input-row">
+        <input id="activityInput" placeholder="Add activity">
+        <button onclick="addItem('activities','activityInput')">Add</button>
+      </div>
+      <ul id="activities"></ul>
+    </div>
 
-<div class="card">
-  <h2>Activities</h2>
-  <input id="activityInput">
-  <button onclick="addItem('activities','activityInput')">Add</button>
-  <ul id="activities"></ul>
-</div>
+    <div class="card">
+      <h2>🛒 Groceries</h2>
+      <div class="input-row">
+        <input id="groceryInput" placeholder="Add grocery item">
+        <button onclick="addItem('groceries','groceryInput')">Add</button>
+      </div>
+      <ul id="groceries"></ul>
+    </div>
 
-<div class="card">
-  <h2>Groceries</h2>
-  <input id="groceryInput">
-  <button onclick="addItem('groceries','groceryInput')">Add</button>
-  <ul id="groceries"></ul>
-</div>
-
-<div class="card">
-  <h2>Chores</h2>
-  <input id="choreInput">
-  <button onclick="addItem('chores','choreInput')">Add</button>
-  <ul id="chores"></ul>
-</div>
+    <div class="card">
+      <h2>🏠 Chores</h2>
+      <div class="input-row">
+        <input id="choreInput" placeholder="Add chore">
+        <button onclick="addItem('chores','choreInput')">Add</button>
+      </div>
+      <ul id="chores"></ul>
+    </div>
+  </div>
 
 <script>
-
 function getData(type) {
   return JSON.parse(localStorage.getItem(type)) || [];
 }
@@ -80,6 +165,13 @@ function toggle(type, index) {
   render();
 }
 
+function deleteItem(type, index) {
+  const data = getData(type);
+  data.splice(index, 1);
+  saveData(type, data);
+  render();
+}
+
 function renderList(type) {
   const list = document.getElementById(type);
   list.innerHTML = "";
@@ -92,6 +184,7 @@ function renderList(type) {
     li.innerHTML = `
       <input type="checkbox" ${item.done ? "checked" : ""} onclick="toggle('${type}', ${index})">
       <span class="${item.done ? "done" : ""}">${item.text}</span>
+      <button class="delete" onclick="deleteItem('${type}', ${index})">Delete</button>
     `;
 
     list.appendChild(li);
