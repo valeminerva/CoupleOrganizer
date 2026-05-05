@@ -21,7 +21,7 @@
     h1 {
       text-align: center;
       font-size: 32px;
-      color: #16a34a;
+      color: #5727F5; /* purple title */
     }
 
     .card {
@@ -50,13 +50,18 @@
       min-width: 180px;
     }
 
+    /* ADD BUTTON → LIGHT PURPLE */
     button {
       padding: 10px 14px;
-      background: #111827;
+      background: #a78bfa;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
+    }
+
+    button:hover {
+      background: #8b5cf6;
     }
 
     ul {
@@ -85,14 +90,26 @@
       color: gray;
     }
 
+    /* DELETE → SOFT RED */
     .delete {
-      background: #ef4444;
+      background: #fca5a5;
       font-size: 12px;
     }
 
+    .delete:hover {
+      background: #ef4444;
+    }
+
+    /* CALENDAR → SOFT GREEN */
     .calendar {
-      background: #16a34a;
+      background: #86efac;
       font-size: 12px;
+      color: #065f46;
+    }
+
+    .calendar:hover {
+      background: #22c55e;
+      color: white;
     }
 
     .assignment {
@@ -233,10 +250,7 @@ function deleteItem(type, index) {
 
 function formatGoogleDate(date, time) {
   const startTime = time || "09:00";
-  const parts = startTime.split(":");
-  const hour = parts[0];
-  const minute = parts[1];
-
+  const [hour, minute] = startTime.split(":");
   const endHour = String(Number(hour) + 1).padStart(2, "0");
 
   const cleanDate = date.replaceAll("-", "");
